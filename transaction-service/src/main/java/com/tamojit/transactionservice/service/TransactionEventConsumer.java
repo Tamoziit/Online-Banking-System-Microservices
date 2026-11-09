@@ -23,6 +23,7 @@ public class TransactionEventConsumer {
     private static final String TRANSACTION_OTP_GENERATED_TOPIC = "transaction.otp.generated";
 
     private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
     private final RedisTemplate<String, String> redisTemplate;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -74,6 +75,18 @@ public class TransactionEventConsumer {
             kafkaTemplate.send(TRANSACTION_OTP_GENERATED_TOPIC, transactionId, otpEvent);
         } catch (Exception e) {
             log.error("Error consuming verification required event: ", e);
+        }
+    }
+
+    @KafkaListener(topics = "fraud.check.clean")
+    public void consumeFraudCheckCleanEvent(
+        @Payload Map<String, Object> payload
+    ) {
+        try {
+            String transactionId = (String) payload.get("transactionId");
+            transactionService.processCleanResult(transactionId);
+        } catch (Exception e) {
+            log.error("Error consuming fraud.check.clean event: ", e);
         }
     }
 }

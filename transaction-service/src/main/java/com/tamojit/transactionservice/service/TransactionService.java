@@ -127,6 +127,19 @@ public class TransactionService {
         return mapToResponse(transaction);
     }
 
+    public void processCleanResult(String transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+            .orElseThrow(() -> new RuntimeException("Transaction not found: " + transactionId));
+
+        // IDEMPOTENCY GUARD
+        if (transaction.getStatus() != TransactionStatus.PROCESSING) {
+            log.warn("Transaction {} not PROCESSING - skipping verification", transactionId);
+            return;
+        }
+
+        completeTransaction(transaction);
+    }
+
     private void compensateTransaction(Transaction transaction, String reason) {
         log.warn("SAGA Compensation - refunding account: {}, amount: {}", transaction.getSenderAccountNumber(), transaction.getAmount());
 
