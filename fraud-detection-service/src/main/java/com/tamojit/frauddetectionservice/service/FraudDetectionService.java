@@ -1,4 +1,4 @@
-package com.tamojit.frauddetectionservice.event;
+package com.tamojit.frauddetectionservice.service;
 
 import com.tamojit.frauddetectionservice.client.AccountServiceClient;
 import com.tamojit.frauddetectionservice.model.FraudCheckResult;

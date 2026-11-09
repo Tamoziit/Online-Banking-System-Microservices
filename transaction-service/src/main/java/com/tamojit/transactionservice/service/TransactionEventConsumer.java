@@ -6,6 +6,7 @@ import com.tamojit.transactionservice.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class TransactionEventConsumer {
      * Consumes verification.required event, published by fraud-detection-service
      * Next steps: Generate OTP & ask user to verify for authenticity check
      */
+    @KafkaListener(topics = "verification.required")
     public void consumeVerificationRequiredEvent(
         @Payload Map<String, Object> payload
     ) {
@@ -42,6 +44,7 @@ public class TransactionEventConsumer {
             Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("transaction not found: " + transactionId));
 
+            // IDEMPOTENCY GUARD
             if (transaction.getStatus() != TransactionStatus.PROCESSING) {
                 log.warn("Transaction {} not PROCESSING - skipping verification", transactionId);
                 return;

@@ -1,4 +1,4 @@
-package com.tamojit.frauddetectionservice.event;
+package com.tamojit.frauddetectionservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
