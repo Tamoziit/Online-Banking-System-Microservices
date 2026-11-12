@@ -37,6 +37,10 @@ public class NotificationService {
         }
     }
 
+    public void consumeTransactionCompleted(
+        @Payload Map<String, Object> payload
+    ) {}
+
     private void sendAlert(
         String accountNumber,
         String subject,
